@@ -1,4 +1,5 @@
 const express = require('express')
+const { restart } = require('nodemon')
 const router = express.Router()
 const Author = require('../models/author')
 
@@ -39,6 +40,54 @@ router.post('/', async (req, res) => {
             author: author,
             errorMessage: 'Error Creating Author'
         })
+    }
+})
+
+router.get('/:id', (req, res) => {
+    res.send(req.params.id)
+})
+
+router.get('/:id/edit', async (req, res) => {
+    try {
+        const author = await Author.findById(req.params.id)
+        res.render('authors/edit', { author: author })
+    } catch {
+        res.redirect('/authors')
+    }
+
+})
+
+router.put('/:id', async (req, res) => {
+    let author
+    try {
+        author = await Author.findById(req.params.id)
+        author.name = req.body.name
+        await author.save()
+        res.redirect(`/authors/${author.id}`)
+    } catch {
+        if(auhor == null) {
+            res.redirect('/')
+        } else {
+            res.render('authors/edit', {
+                author: author,
+                errorMessage: 'Error Updating Author'
+            })
+        }
+    }
+})
+
+router.delete('/:id', async (req, res) => {
+    let author
+    try {
+        author = await Author.findById(req.params.id)
+        await author.remove()
+        res.redirect(`/authors`)
+    } catch {
+        if(auhor == null) {
+            res.redirect('/')
+        } else {
+            res.redirect(`/authors/${author.id}`)
+        }
     }
 })
 
